@@ -6,10 +6,11 @@ import java.util.UUID
 
 @Entity(tableName = "lineage_events")
 data class LineageEvent(
-    @PrimaryKey val eventId: String = UUID.randomUUID().toString(),
+    @PrimaryKey
+    val eventId: String = UUID.randomUUID().toString(),
     val eventType: String,
     val timestamp: String,
-    val data: String, // Stored as JSON string
-    val coherenceDelta: Float,
-    val severity: Int
+    val data: String,
+    val coherenceDelta: Double = 0.0,
+    val severity: Int = 1
 )

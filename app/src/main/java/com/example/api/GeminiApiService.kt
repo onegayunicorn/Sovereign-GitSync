@@ -1,26 +1,32 @@
 package com.example.api
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 @Serializable
-data class Content(val parts: List<Part>)
+data class ChatRequest(val message: String, val context: String? = null, val sessionId: String? = null)
+
 @Serializable
-data class Part(val text: String)
+data class ChatResponse(val response: String, val sessionId: String, val timestamp: String, val confidence: Double = 0.95)
+
 @Serializable
-data class GenerateContentRequest(val contents: List<Content>)
+data class CouncilRequest(val query: String, val context: Map<String, String> = emptyMap())
+
 @Serializable
-data class GenerateContentResponse(val candidates: List<Candidate>)
-@Serializable
-data class Candidate(val content: Content)
+data class CouncilResponse(val consensus: Double, val decision: String, val votes: Map<String, Boolean>, val reasoning: String)
 
 interface GeminiApiService {
-    @POST("v1beta/models/gemini-3.5-flash:generateContent")
-    suspend fun generateContent(
-        @Query("key") apiKey: String,
-        @Body request: GenerateContentRequest
-    ): GenerateContentResponse
+    @POST("/api/chat")
+    suspend fun sendMessage(@Body request: ChatRequest): ChatResponse
+
+    @POST("/api/council/chat")
+    suspend fun consultCouncil(@Body request: CouncilRequest): CouncilResponse
+
+    @GET("/git/conflicts")
+    suspend fun getConflicts(): List<ConflictData>
 }
+
+@Serializable
+data class ConflictData(val id: String, val file: String, val type: String, val severity: Double, val coherence_impact: Double)

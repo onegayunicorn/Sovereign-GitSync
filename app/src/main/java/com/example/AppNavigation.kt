@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import androidx.compose.ui.Modifier
+import com.example.ui.DashboardScreen
+import com.example.ui.ChatScreen
 
 @Composable
 fun AppNavigation(viewModel: SovereignViewModel, chatViewModel: ChatViewModel) {
@@ -30,7 +32,7 @@ fun AppNavigation(viewModel: SovereignViewModel, chatViewModel: ChatViewModel) {
         }
     ) { innerPadding ->
         NavHost(navController, startDestination = "Dashboard", modifier = Modifier.padding(innerPadding)) {
-            composable("Dashboard") { SovereignDashboard(viewModel) }
+            composable("Dashboard") { DashboardScreen(viewModel) }
             composable("Chat") { ChatScreen(chatViewModel) }
         }
     }

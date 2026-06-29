@@ -6,14 +6,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.SovereignRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class SovereignViewModel(private val repository: SovereignRepository) : ViewModel() {
-    val conflictGenes = repository.allConflictGenes
+    val conflictGenes = repository.getAllConflictGenes()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
         
-    val lineageEvents = repository.allLineageEvents
+    val lineageEvents = repository.getRecentLineageEvents()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val coherenceScore = MutableStateFlow(0.9998)
 
     fun refresh() {
         // Mock refreshing

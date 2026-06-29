@@ -15,11 +15,10 @@ class ChatViewModel : ViewModel() {
             isLoading.value = true
             messages.value = messages.value + (prompt to true)
             try {
-                val response = RetrofitClient.service.generateContent(
-                    BuildConfig.GEMINI_API_KEY,
-                    GenerateContentRequest(listOf(Content(listOf(Part(prompt)))))
+                val response = RetrofitClient.instance.sendMessage(
+                    ChatRequest(message = prompt)
                 )
-                val reply = response.candidates.first().content.parts.first().text
+                val reply = response.response
                 messages.value = messages.value + (reply to false)
             } catch (e: Exception) {
                 messages.value = messages.value + ("Error: ${e.message}" to false)

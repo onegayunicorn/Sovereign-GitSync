@@ -1,19 +1,30 @@
 package com.example.api
 
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://generativelanguage.googleapis.com/"
-    val service: GeminiApiService by lazy {
-        val json = Json { ignoreUnknownKeys = true }
+    private const val BASE_URL = "https://api.sovereign-gitsync.ai/"
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    val instance: GeminiApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(OkHttpClient.Builder().build())
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GeminiApiService::class.java)
     }
