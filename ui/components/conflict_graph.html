@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node { stroke: #fff; stroke-width: 1.5px; }
+        .link { stroke: #999; stroke-opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <svg width="400" height="300"></svg>
+    <script>
+        const data = {
+            nodes: [
+                {id: "Core", group: 1},
+                {id: "ConflictA", group: 2},
+                {id: "ConflictB", group: 2},
+                {id: "Resolution1", group: 3},
+                {id: "Resolution2", group: 3}
+            ],
+            links: [
+                {source: "Core", target: "ConflictA"},
+                {source: "Core", target: "ConflictB"},
+                {source: "ConflictA", target: "Resolution1"},
+                {source: "ConflictB", target: "Resolution2"}
+            ]
+        };
+
+        const svg = d3.select("svg"),
+              width = +svg.attr("width"),
+              height = +svg.attr("height");
+
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        const link = svg.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(data.links)
+            .enter().append("line")
+            .attr("class", "link");
+
+        const node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(data.nodes)
+            .enter().append("circle")
+            .attr("r", 5)
+            .attr("fill", d => d.group === 1 ? "red" : (d.group === 2 ? "orange" : "green"));
+
+        simulation.on("tick", () => {
+            link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+            node.attr("cx", d => d.x).attr("cy", d => d.y);
+        });
+    </script>
+</body>
+</html>

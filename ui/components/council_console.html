@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+    :root {
+        --bg-panel: rgba(20, 20, 30, 0.95);
+        --border: rgba(100, 100, 140, 0.3);
+        --accent-purple: #a855f7;
+        --text-primary: #ffffff;
+    }
+    #council-console {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+    #console-header {
+        padding: 15px;
+        border-bottom: 1px solid var(--border);
+        font-weight: 700;
+        color: var(--accent-purple);
+    }
+    #console-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+    }
+    #console-input {
+        padding: 10px;
+        border-top: 1px solid var(--border);
+        display: flex;
+    }
+    #console-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+    }
+    #console-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: var(--accent-purple);
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1001;
+    }
+</style>
+</head>
+<body>
+
+<div id="console-toggle" onclick="toggleConsole()">Ω</div>
+
+<div id="council-console">
+    <div id="console-header">Council Assistant</div>
+    <div id="console-messages"></div>
+    <div id="console-input">
+        <input type="text" id="userInput" placeholder="Ask the Council...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function toggleConsole() {
+        const console = document.getElementById('council-console');
+        console.style.display = console.style.display === 'flex' ? 'none' : 'flex';
+    }
+    
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const msg = input.value;
+        if (!msg) return;
+        
+        // Add user msg
+        addMessage('You', msg);
+        input.value = '';
+        
+        // API Call
+        try {
+            const response = await fetch('/api/council/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompt: msg})
+            });
+            const data = await response.json();
+            addMessage('Council', data.reply);
+        } catch (e) {
+            addMessage('Council', 'Error: Unable to connect to Sovereign Core.');
+        }
+    }
+    
+    function addMessage(sender, text) {
+        const messages = document.getElementById('console-messages');
+        messages.innerHTML += `<div><strong>${sender}:</strong> ${text}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
